@@ -9,7 +9,7 @@ func newAccount(value string) Account {
 type Transaction struct {
 	From  Account `json:"from"` // JSON encoding struct tag to ensure field name 'From' in Json output
 	To    Account `json:"to"`
-	Value uint	  `json:"value"`
+	Value uint    `json:"value"`
 	Data  string  `json:"data"`	
 }
 
