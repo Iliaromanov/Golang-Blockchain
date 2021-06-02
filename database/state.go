@@ -60,3 +60,39 @@ func NewStateFromDisk() (*State, error) {
 
 	return state, nil
 }
+
+// Add method for State
+// adds new transaction to transactionMempool
+func (s *State) Add(transaction Transaction) error {
+	if err := s.apply(transaction); err != nil {
+		return err
+	}
+
+	s.transactionMempool = append(s.transactionMempool, transaction)
+
+	return nil
+}
+
+// Persist to disk method for State
+// writes transactions in transactionMempool to the transaction.db file
+func (s *State) Persist() error {
+	// make copy of mempool because s.transactinMempool will be modified in loop
+	mempool := make([]Transaction, len(s.transactionMempool))
+	copy(mempool, s.transactionMempool)
+
+	for _, tx := range mempool {
+		txJson, err := json.Marshal(tx)
+		if err != nil {
+			return err
+		}
+
+		if _, err := s.dbFile.Write(append(txJson, '\n')); err != nil {
+			return err
+		}
+
+		// Remove transaction written to file from mempool
+		s.transactionMempool = s.transactionMempool[1:]
+	}
+	
+	return nil
+}
