@@ -96,3 +96,23 @@ func (s *State) Persist() error {
 	
 	return nil
 }
+
+
+// Apply method for state
+// Applies a transaction to state accordingly
+func (s *State) apply(tx Transaction) error {
+	// If its a reward to creator just add the amount
+	if tx.IsReward() {
+		s.Balances[tx.To] += tx.Value
+		return nil
+	}
+
+	// Check that sender has enough tokens to make transaction
+	if tx.Value > s.Balances[tx.From] {
+		return fmt.Errorf("insufficient balance")
+	}
+
+	s.Balances[tx.From] -= tx.Value
+	s.Balances[tx.To] += tx.Value
+	return nil
+}
