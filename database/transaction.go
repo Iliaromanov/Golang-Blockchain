@@ -20,6 +20,6 @@ func NewTransaction(from Account, to Account, value uint, data string) Transacti
 
 // Checks if the transaction was a reward
 // (creator of blockchain {me} gets a weekly reward amount of tokens for my brilliant idea)
-func IsReward(t Transaction) bool {
+func (t Transaction) IsReward() bool {
 	return t.Data == "reward"
 }
