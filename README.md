@@ -1,5 +1,7 @@
 # Blockchain
-Simple Blockchain implementation in Go
+Simple Blockchain ledger implementation in Go. 
+
+This is a token based ledger and I have decided to name the tokens BLT (Blockchain Ledger Tokens) because it sounds cool.
 
 <!--Hidden Notes:
     * Event-based architecture: production, consumtion, reaction to events (eg. transaction is event, update state is reaction)
