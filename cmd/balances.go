@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"github.com/spf13/cobra"
@@ -35,7 +35,7 @@ var balancesListCmd = &cobra.Command{
 		fmt.Println("Account balances:")
 		fmt.Println("-----------------")
 		for account, balance := range state.Balances {
-			fmt.Printf("%v: %v", account, balance)
+			fmt.Printf("%v: %v\n", account, balance)
 		}
 	},
 }

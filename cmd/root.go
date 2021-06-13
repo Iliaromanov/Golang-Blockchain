@@ -1,9 +1,8 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 /**/
@@ -27,11 +26,8 @@ func init() {
 	tblCmd.AddCommand(BalancesCmd())
 }
 
-func main() {
-	if err := tblCmd.Execute(); err != nil { // Execute root command and check for errors
-		fmt.Fprintln(os.Stderr, err) // Print error to stderr instead of stdio
-		os.Exit(1) // exit with code 1 (failed)
-	}
+func Execute() {
+	cobra.CheckErr(tblCmd.Execute())
 }
 
 func IncorrectUsageErr() error {
