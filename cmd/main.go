@@ -24,6 +24,7 @@ var (
 
 func init() {
 	tblCmd.AddCommand(versionCmd)
+	tblCmd.AddCommand(BalancesCmd())
 }
 
 func main() {
@@ -31,4 +32,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, err) // Print error to stderr instead of stdio
 		os.Exit(1) // exit with code 1 (failed)
 	}
+}
+
+func IncorrectUsageErr() error {
+	return fmt.Errorf("Incorrect usage")
 }
