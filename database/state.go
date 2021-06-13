@@ -97,6 +97,9 @@ func (s *State) Persist() error {
 	return nil
 }
 
+func (s *State) Close() {
+	s.dbFile.Close()
+}
 
 // Apply method for state
 // Applies a transaction to state accordingly
