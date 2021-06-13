@@ -6,6 +6,10 @@ This is a token based ledger and I have decided to name the tokens BLT (Blockcha
 
 ## CLI Usage
 
+For info on available commands and flags execute:
+
+> `go run .\main.go --help`
+
 To list balances in current database state execute:
    
 > `go run .\main.go balances list`
