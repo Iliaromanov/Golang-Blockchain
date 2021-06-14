@@ -21,12 +21,12 @@ func NewStateFromDisk() (*State, error) {
 	}
 
 	genFilePath := filepath.Join(cwd, "database", "genesis.json") // concatenates filepath, adding '/' where necessary
-	gen, err := loadGenesis(genFilePath) // maybe use os.Open()?
+	gen, err := loadGenesis(genFilePath) // load genesis.json into genesis struct
 	if err != nil {
 		return nil, err
 	}
 
-	// Store balances from genesis.json
+	// Store balances from genesis struct in map
 	balances := make(map[Account]uint)
 	for account, balance := range gen.Balances {
 		balances[account] = balance
@@ -50,10 +50,10 @@ func NewStateFromDisk() (*State, error) {
 		}
 
 		var transaction Transaction
-		json.Unmarshal(scanner.Bytes(), &transaction) // parses state.json line into transaction
+		json.Unmarshal(scanner.Bytes(), &transaction) // parse state.json line into transaction struct
 
 		// Add transaction to state
-		if err := state.apply(transaction); err != nil { // should update balances map and append to transactions slice
+		if err := state.apply(transaction); err != nil { // update balances map
 			return nil, err
 		}
 	}
@@ -90,7 +90,7 @@ func (s *State) Persist() error {
 			return err
 		}
 
-		// Remove transaction written to file from mempool
+		// Remove transaction written to transaction.db from mempool
 		s.transactionMempool = s.transactionMempool[1:]
 	}
 	
