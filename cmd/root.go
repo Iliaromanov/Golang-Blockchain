@@ -23,13 +23,13 @@ var (
 
 func init() {
 	tblCmd.AddCommand(versionCmd)
-	tblCmd.AddCommand(BalancesCmd())
+	tblCmd.AddCommand(balancesCmd())
 }
 
 func Execute() {
 	cobra.CheckErr(tblCmd.Execute())
 }
 
-func IncorrectUsageErr() error {
+func incorrectUsageErr() error {
 	return fmt.Errorf("Incorrect usage")
 }

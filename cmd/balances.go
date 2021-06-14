@@ -8,12 +8,12 @@ import (
 )
 
 // Loads latest db state and prints it to stdout
-func BalancesCmd() *cobra.Command {
+func balancesCmd() *cobra.Command {
 	var balancesCmd = &cobra.Command{
 		Use:   "balances",
 		Short: "Interact with balances (list ...).",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return IncorrectUsageErr()
+			return incorrectUsageErr()
 		},
 	}
 	balancesCmd.AddCommand(balancesListCmd)
