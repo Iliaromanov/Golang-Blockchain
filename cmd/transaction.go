@@ -10,7 +10,7 @@ import (
 const flagFrom = "from"
 const flagTo = "to"
 const flagValue = "value"
-const flagData = ""
+const flagData = "data"
 
 func transactionCmd() *cobra.Command {
 	var txCmd = &cobra.Command{
