@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+const flagFrom = "from"
+const flagTo = "to"
+const flagValue = "value"
+const flagData = ""
 
 func transactionCmd() *cobra.Command {
 	var txCmd = &cobra.Command{
@@ -31,13 +35,14 @@ func transactionAddCmd() * cobra.Command {
 			from, _ := cmd.Flags().GetString(flagFrom)
 			to, _ := cmd.Flags().GetString(flagTo)
 			value, _ := cmd.Flags().GetUint(flagValue)
+			data, _ := cmd.Flags().GetString(flagData)
 
 			// Create account structs for from Account and to Account
 			fromAcc := database.NewAccount(from)
 			toAcc := database.NewAccount(to)
 			
 			// Create transaction struct for the transaction
-			tx := database.NewTransaction(fromAcc, toAcc, value, "")
+			tx := database.NewTransaction(fromAcc, toAcc, value, data)
 			
 			// Get current state
 			state, err := database.NewStateFromDisk()
@@ -56,6 +61,19 @@ func transactionAddCmd() * cobra.Command {
 			}
 		},
 	}
+
+
+	// Create flags to allow user to specify transaction details within the CLI
+	txAddCmd.Flags().String(flagFrom, "", "Account from which tokens are sent")
+	txAddCmd.MarkFlagRequired(flagFrom)
+
+	txAddCmd.Flags().String(flagTo, "", "Account that recieves the tokens")
+	txAddCmd.MarkFlagRequired(flagTo)
+
+	txAddCmd.Flags().Uint(flagValue, 0, "Amount of tokens being transferred")
+	txAddCmd.MarkFlagRequired(flagValue)
+
+	txAddCmd.Flags().String(flagData, "", "Possible Values: 'reward'")
 
 	return txAddCmd
 }
