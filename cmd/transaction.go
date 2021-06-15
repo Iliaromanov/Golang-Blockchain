@@ -20,6 +20,7 @@ func transactionCmd() *cobra.Command {
 			return incorrectUsageErr()
 		},
 	}
+	txCmd.AddCommand(transactionAddCmd())
 
 	return txCmd
 }
@@ -55,6 +56,13 @@ func transactionAddCmd() * cobra.Command {
 
 			//Add transaction to mempool
 			err = state.Add(tx)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
+			}
+
+			//Persist transaction to disk
+			err = state.Persist()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
