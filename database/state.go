@@ -3,15 +3,20 @@ package database
 import (
 	"fmt"
 	"bufio"
+	"io/ioutil"
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"crypto/sha256"
 )
+
+type Snapshot [32]byte // Struct to store 32byte hash
 
 type State struct {
 	Balances map[Account]uint
 	transactionMempool []Transaction
 	dbFile *os.File
+	snapshot Snapshot // unique hash for latest state update
 }
 
 func NewStateFromDisk() (*State, error) {
@@ -117,5 +122,20 @@ func (s *State) apply(tx Transaction) error {
 
 	s.Balances[tx.From] -= tx.Value
 	s.Balances[tx.To] += tx.Value
+	return nil
+}
+
+func (s *State) doSnapshot() error {
+	_, err := s.dbFile.Seek(0, 0) // offsets the reader to start of file
+	if err != nil {
+		return err
+	}
+
+	txsData, err := ioutil.ReadAll(s.dbFile)
+	if err != nil {
+		return err
+	}
+	s.snapshot =sha256.Sum256(txsData) // hash the transaction data retrieved from transaction.db
+
 	return nil
 }
