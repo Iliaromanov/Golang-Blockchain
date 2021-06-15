@@ -24,6 +24,7 @@ var (
 func init() {
 	tblCmd.AddCommand(versionCmd)
 	tblCmd.AddCommand(balancesCmd())
+	tblCmd.AddCommand(transactionCmd())
 }
 
 func Execute() {
