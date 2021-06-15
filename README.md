@@ -14,6 +14,8 @@ To list balances in current database state execute:
    
 > `go run .\main.go balances list`
 
+To add transaction to ledger execute:
+> `go run .\main.go tx add --from={Account sending tokens} --to={Account recieving tokens} --value={Amount of tokens sent}`
 
 <!--Hidden Notes:
     * Event-based architecture: production, consumtion, reaction to events (eg. transaction is event, update state is reaction)
