@@ -10,6 +10,7 @@ import (
 	"crypto/sha256"
 )
 
+
 type Snapshot [32]byte // Struct to store 32byte hash
 
 type State struct {
@@ -46,7 +47,7 @@ func NewStateFromDisk() (*State, error) {
 	}
 
 	scanner := bufio.NewScanner(file)
-	state := &State{balances, make([]Transaction, 0), file}
+	state := &State{balances, make([]Transaction, 0), file, Snapshot{}}
 
 	// Iterate of transaction.db line by line
 	for scanner.Scan() {
@@ -61,6 +62,11 @@ func NewStateFromDisk() (*State, error) {
 		if err := state.apply(transaction); err != nil { // update balances map
 			return nil, err
 		}
+	}
+
+	err = state.doSnapshot()
+	if err != nil {
+		return nil, err
 	}
 
 	return state, nil
@@ -80,7 +86,7 @@ func (s *State) Add(transaction Transaction) error {
 
 // Persist to disk method for State
 // writes transactions in transactionMempool to the transaction.db file
-func (s *State) Persist() error {
+func (s *State) Persist() (Snapshot, error) {
 	// make copy of mempool because s.transactinMempool will be modified in loop
 	mempool := make([]Transaction, len(s.transactionMempool))
 	copy(mempool, s.transactionMempool)
@@ -88,18 +94,27 @@ func (s *State) Persist() error {
 	for _, tx := range mempool {
 		txJson, err := json.Marshal(tx)
 		if err != nil {
-			return err
+			return Snapshot{}, err
+		}
+		
+		fmt.Printf("Persisting new Transaction to disk:\n")
+		fmt.Printf("\t%s\n", txJson)
+		if _, err := s.dbFile.Write(append(txJson, '\n')); err != nil {
+			return Snapshot{}, err
 		}
 
-		if _, err := s.dbFile.Write(append(txJson, '\n')); err != nil {
-			return err
+		// Create snapshot (hash state after txJson is appended)
+		err = s.doSnapshot()
+		if err != nil {
+			return Snapshot{}, err
 		}
+		fmt.Printf("New DB Snapshot: %x\n", s.snapshot)
 
 		// Remove transaction written to transaction.db from mempool
 		s.transactionMempool = s.transactionMempool[1:]
 	}
 	
-	return nil
+	return s.snapshot, nil
 }
 
 func (s *State) Close() {
