@@ -26,4 +26,7 @@ To add transaction to ledger execute:
        original blockchain state was and are never updated afterwards. The database state changes are called Transactions (TX).
     * Decentralized: every user has a copy of the blockchain on their disk, so one user can't change the entire blockchain.
     * Batch processing: is the running of "jobs that can run without end user interaction, or can be scheduled to run as resources permit."
+      |-> Batching is a common strategy when working with SQL/NoSQL/Other database systems. The batch strategy consist of “handling multiple items at once”. 
+          The solution is to   encapsulate transactions to linked “chunks”, “blocks”.
+
 -->
