@@ -28,5 +28,12 @@ To add transaction to ledger execute:
     * Batch processing: is the running of "jobs that can run without end user interaction, or can be scheduled to run as resources permit."
       |-> Batching is a common strategy when working with SQL/NoSQL/Other database systems. The batch strategy consist of “handling multiple items at once”. 
           The solution is to   encapsulate transactions to linked “chunks”, “blocks”.
+    * Hashing:
+         The ParentHash is being used as a reliable “checkpoint,” representing and referencing the previously hashed database content.
+         ParentHash improves performance; Only new data + reference to previous state needs to be hashed to achieve immutability.
+         E.g., If you attempt to modify a TX value in Block 0, it will result in a new unique Block 0 hash. Hash of Block 1, based on the parent
+         Block 0 reference, would therefore immediately change as well. The cascade effect would affect all the blocks, making the malicious
+         attacker database invalid - different from the rest of the honest database stakeholders.
+         The attacker database would be, therefore, excluded from participating in the network.
 
 -->
