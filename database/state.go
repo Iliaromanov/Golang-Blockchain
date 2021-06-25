@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type State struct {
@@ -84,34 +85,39 @@ func (s *State) Add(transaction Transaction) error {
 // Persist to disk method for State
 // writes transactions in transactionMempool to the transaction.db file
 func (s *State) Persist() (Hash, error) {
-	// make copy of mempool because s.transactinMempool will be modified in loop
-	mempool := make([]Transaction, len(s.transactionMempool))
-	copy(mempool, s.transactionMempool)
+	// Create block
+	block := NewBlock(
+		s.latestBlockHash,
+		uint64(time.Now().Unix()),
+		s.transactionMempool,
+	)
 
-	for _, tx := range mempool {
-		txJson, err := json.Marshal(tx)
-		if err != nil {
-			return Hash{}, err
-		}
-		
-		fmt.Printf("Persisting new Transaction to disk:\n")
-		fmt.Printf("\t%s\n", txJson)
-		if _, err := s.dbFile.Write(append(txJson, '\n')); err != nil {
-			return Hash{}, err
-		}
-
-		// Create snapshot (hash state after txJson is appended)
-		err = s.doSnapshot()
-		if err != nil {
-			return Hash{}, err
-		}
-		fmt.Printf("New DB Snapshot: %x\n", s.snapshot)
-
-		// Remove transaction written to transaction.db from mempool
-		s.transactionMempool = s.transactionMempool[1:]
+	// Generate hash for the block
+	blockHash, err := block.Hash()
+	if err != nil {
+		return Hash{}, err
 	}
-	
-	return s.snapshot, nil
+
+	// Encode block into JSON formatted string
+	blockWrp := BlockWrap{blockHash, block}
+	blockWrpJson, err := json.Marshal(blockWrp)
+	if err != nil {
+		return Hash{}, err 
+	}
+
+	fmt.Println("Persisting new block to disk:")
+	fmt.Printf("\t%s\n", blockWrpJson)
+
+	// Write the block to DB file on disk
+	_, err = s.dbFile.Write(append(blockWrpJson, '\n'))
+	if err != nil {
+		return Hash{}, err
+	}
+
+	s.latestBlockHash = blockHash // Update latest block hash value
+	s.transactionMempool = []Transaction{} // reset transaction mempool
+
+	return s.latestBlockHash, nil
 }
 
 func (s *State) Close() {
@@ -134,22 +140,5 @@ func (s *State) apply(tx Transaction) error {
 
 	s.Balances[tx.From] -= tx.Value
 	s.Balances[tx.To] += tx.Value
-	return nil
-}
-
-
-// State method to create hash for provided state transaction data
-func (s *State) doSnapshot() error {
-	_, err := s.dbFile.Seek(0, 0) // offsets the reader to start of file
-	if err != nil {
-		return err
-	}
-
-	txsData, err := ioutil.ReadAll(s.dbFile)
-	if err != nil {
-		return err
-	}
-	s.snapshot = sha256.Sum256(txsData) // hash the transaction data retrieved from transaction.db
-
 	return nil
 }
