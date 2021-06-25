@@ -7,30 +7,15 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"crypto/sha256"
 )
-
-
-type Hash [32]byte // Struct to store 32byte hash
-
-
-type Block struct {
-	Header BlockHeader // Blocks metadata (parent block hash + time)
-	Transactions []Transaction // new transactions only (payload)
-}
-
-type BlockHeader struct {
-	Parent Hash // hash of parent block
-	Time uint64
-}
-
 
 type State struct {
 	Balances map[Account]uint
 	transactionMempool []Transaction
 	dbFile *os.File
-	snapshot Hash // unique hash for latest state update
+	latestBlockHash Hash // unique hash for latest state update
 }
+
 
 func NewStateFromDisk() (*State, error) {
 	cwd, err := os.Getwd() // gets path to current directory
@@ -152,17 +137,6 @@ func (s *State) apply(tx Transaction) error {
 	return nil
 }
 
-
-// Hashes block struct encoded as JSON
-func (b Block) Hash() (Hash, error) {
-	blockJson, err := json.Marshal(b)
-
-	if err != nil {
-		return Hash{}, err
-	}
-
-	return sha256.Sum256(blockJson), nil
-}
 
 // State method to create hash for provided state transaction data
 func (s *State) doSnapshot() error {
