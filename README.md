@@ -35,5 +35,8 @@ To add transaction to ledger execute:
          Block 0 reference, would therefore immediately change as well. The cascade effect would affect all the blocks, making the malicious
          attacker database invalid - different from the rest of the honest database stakeholders.
          The attacker database would be, therefore, excluded from participating in the network.
+    * The time being used for block timestamps is Unix time:
+         Unix returns t as a Unix time, the number of seconds elapsed since January 1, 1970 UTC. The result doesn't depend on the location associated with t. Unix-like
+         operating systems often record time as a 32bit count of seconds, but since this method returns a 64bit value it is valid for billions of years into the past or future.
 
 -->
