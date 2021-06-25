@@ -13,6 +13,18 @@ import (
 
 type Hash [32]byte // Struct to store 32byte hash
 
+
+type Block struct {
+	Header BlockHeader // Blocks metadata (parent block hash + time)
+	Transactions []Transaction // new transactions only (payload)
+}
+
+type BlockHeader struct {
+	Parent Hash // hash of parent block
+	Time uint64
+}
+
+
 type State struct {
 	Balances map[Account]uint
 	transactionMempool []Transaction
@@ -138,6 +150,18 @@ func (s *State) apply(tx Transaction) error {
 	s.Balances[tx.From] -= tx.Value
 	s.Balances[tx.To] += tx.Value
 	return nil
+}
+
+
+// Hashes block struct encoded as JSON
+func (b Block) Hash() (Hash, error) {
+	blockJson, err := json.Marshal(b)
+
+	if err != nil {
+		return Hash{}, err
+	}
+
+	return sha256.Sum256(blockJson), nil
 }
 
 // State method to create hash for provided state transaction data
