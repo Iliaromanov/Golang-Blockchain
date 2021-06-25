@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"bufio"
-	"io/ioutil"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -70,13 +69,22 @@ func NewStateFromDisk() (*State, error) {
 	return state, nil
 }
 
+func (s *State) AddBlock(b Block) error {
+	for _, tx := range b.Transactions {
+		if err := s.AddTx(tx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Add method for State
 // adds new transaction to transactionMempool
-func (s *State) Add(transaction Transaction) error {
+func (s *State) AddTx(transaction Transaction) error {
 	if err := s.apply(transaction); err != nil {
 		return err
 	}
-
 	s.transactionMempool = append(s.transactionMempool, transaction)
 
 	return nil
@@ -122,6 +130,15 @@ func (s *State) Persist() (Hash, error) {
 
 func (s *State) Close() {
 	s.dbFile.Close()
+}
+
+func (s *State) applyBlock(b Block) error {
+	for _, tx := range b.Transactions {
+		if err := s.apply(tx); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Apply method for state
