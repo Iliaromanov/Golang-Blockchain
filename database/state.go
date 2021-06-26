@@ -37,7 +37,7 @@ func NewStateFromDisk() (*State, error) {
 
 	// Updating genesis State balances by sequentially 
 	//  replaying all database events from transactions.db
-	transactionDbFilePath := filepath.Join(cwd, "database", "transaction.db")
+	transactionDbFilePath := filepath.Join(cwd, "database", "block.db")
 	file, err := os.OpenFile(transactionDbFilePath, os.O_APPEND|os.O_RDWR, 0600) // 0600 is readable+writable permission
 	if err != nil {
 		return nil, err
@@ -52,18 +52,19 @@ func NewStateFromDisk() (*State, error) {
 			return nil, err
 		}
 
-		var transaction Transaction
-		json.Unmarshal(scanner.Bytes(), &transaction) // parse state.json line into transaction struct
-
-		// Add transaction to state
-		if err := state.apply(transaction); err != nil { // update balances map
+		blockWrapJson := scanner.Bytes() // read json string
+		var blockWrp BlockWrap 
+		err = json.Unmarshal(blockWrapJson, &blockWrp) // unmarshal json string into BlockWrap struct
+		if err != nil {
 			return nil, err
 		}
-	}
 
-	err = state.doSnapshot()
-	if err != nil {
-		return nil, err
+		// Add transaction to state
+		err = state.applyBlock(blockWrp.Value)
+		if err != nil { // update balances map
+			return nil, err
+		}
+		state.latestBlockHash = blockWrp.Key // update latest block hash value
 	}
 
 	return state, nil

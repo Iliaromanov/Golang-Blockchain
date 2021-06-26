@@ -55,7 +55,7 @@ func transactionAddCmd() * cobra.Command {
 			defer state.Close()
 
 			//Add transaction to mempool
-			err = state.Add(tx)
+			err = state.AddTx(tx)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				os.Exit(1)
