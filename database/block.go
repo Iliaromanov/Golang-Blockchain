@@ -2,10 +2,24 @@ package database
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 )
 
 type Hash [32]byte // Struct to store 32byte hash
+
+
+// Converts string hash to byte array
+func (h Hash) MarshalText() ([]byte, error) {
+	return []byte(hex.EncodeToString(h[:])), nil
+}
+
+// Converts sha256.Sum256 []byte array output to string
+func (h *Hash) UnmarshalText(data []byte) error {
+	_, err := hex.Decode(h[:], data)
+	return err
+}
+
 
 // Main block struct
 type Block struct {
