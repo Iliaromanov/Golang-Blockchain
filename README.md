@@ -1,6 +1,6 @@
 # Golang-Blockchain
 
-Simple Blockchain ledger implementation in Go.
+Blockchain ledger implementation in Go.
 
 This reporsitory contains **two** separate implementations of a Blockchain in Golang: 
 
