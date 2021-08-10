@@ -1,8 +1,5 @@
 # Golang-Blockchain
-Blockchain ledger implementation in Go. 
-
-This is a token based ledger and I have decided to name the tokens BLT (Blockchain Ledger Tokens) because it sounds cool.
-
+Blockchain ledger implementation in Go.
 
 ## CLI Usage
 
