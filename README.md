@@ -1,6 +1,8 @@
 # Golang-Blockchain
 Blockchain ledger implementation in Go.
 
+*This project is a work in progress*
+
 ## CLI Usage
 
 For info on available commands and flags execute:
